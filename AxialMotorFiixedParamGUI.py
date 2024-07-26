@@ -21,6 +21,7 @@ class MainWindow(QWidget):
 
         self.inputs = {
             "Number of Coils": QLineEdit(),
+            "Number of Turns": QLineEdit(),
             "Input Voltage (V)": QLineEdit(),
             "Outer Radius (m)": QLineEdit(),
             "Desired Torque (N-m)": QLineEdit(),
@@ -30,6 +31,7 @@ class MainWindow(QWidget):
 
         self.defaults = {
             "Number of Coils": 12,
+            "Number of Turns": None,
             "Input Voltage (V)": 12,
             "Outer Radius (m)": 0.127,  # 5 inches converted to meters
             "Desired Torque (N-m)": 5.94,
@@ -39,7 +41,8 @@ class MainWindow(QWidget):
 
         for key, line_edit in self.inputs.items():
             form_layout.addRow(QLabel(key), line_edit)
-            line_edit.setText(str(self.defaults[key]))
+            default_value = self.defaults[key]
+            line_edit.setText("" if default_value is None else str(default_value))
 
         left_layout.addLayout(form_layout)
 
@@ -83,6 +86,7 @@ class MainWindow(QWidget):
     def calculate(self):
         parameter_mapping = {
             "Number of Coils": "coils",
+            "Number of Turns": "turns",
             "Input Voltage (V)": "input_voltage",
             "Outer Radius (m)": "outer_radius",
             "Desired Torque (N-m)": "desired_torque",
@@ -93,7 +97,11 @@ class MainWindow(QWidget):
         parameters = {}
         for key, line_edit in self.inputs.items():
             try:
-                parameters[parameter_mapping[key]] = float(line_edit.text())
+                text_value = line_edit.text()
+                if key == "Number of Turns" and text_value == "":
+                    parameters[parameter_mapping[key]] = None
+                else:
+                    parameters[parameter_mapping[key]] = float(text_value)
             except ValueError:
                 parameters[parameter_mapping[key]] = self.defaults[key]
 

@@ -1,13 +1,14 @@
 import math
 
 class AxialMotorDesign:
-    def __init__(self, coils, input_voltage, outer_radius, desired_torque, esc_frequency, magnetic_flux_density=0.6):
+    def __init__(self, coils, input_voltage, outer_radius, desired_torque, esc_frequency, turns=None, magnetic_flux_density=0.6):
         self.coils = self.validate_coils(coils)
         self.input_voltage = input_voltage
         self.outer_radius = outer_radius
         self.inner_radius = outer_radius * 0.58  # Optimal ratio
         self.desired_torque = desired_torque
         self.esc_frequency = esc_frequency
+        self.turns = turns
         self.magnetic_flux_density = magnetic_flux_density  # Adjustable parameter
         self.poles = self.calculate_poles()
         self.magnets = self.calculate_magnets()
@@ -67,9 +68,12 @@ class AxialMotorDesign:
 
     def calculate_number_of_coil_turns(self):
         """
-        Calculate the number of turns per coil.
+        Calculate the number of turns per coil if not provided.
         Equation: N_ph = e_ph / (A_coil * ω_e * B_m)
         """
+        if self.turns is not None:
+            return self.turns
+
         A_rotor = self.calculate_rotor_area()
         A_coil = A_rotor / self.coils  # Assuming the coil area is the rotor area divided by the number of coils
         B_m = self.calculate_peak_flux_density()
