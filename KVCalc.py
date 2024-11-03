@@ -33,8 +33,8 @@ class KVCalculatorSimple(QWidget):
 
     def calculate(self):
         try:
-            original_kv = 62.5  # Assuming a default original KV rating (RPM/V)
-            original_turns = 30  # Assuming a default original number of turns
+            original_kv = 62.5  # default original KV rating (RPM/V)
+            original_turns = 30  # default original number of turns
 
             desired_rpm = float(self.inputs["Desired RPM"].text())
             voltage = float(self.inputs["Voltage (V)"].text())
