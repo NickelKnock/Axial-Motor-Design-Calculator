@@ -1,15 +1,15 @@
-# AxialMotorFixedParamGUI.py
+# AxialMotorFixedParamGUI.py (PyQt6 port)
 import os, sys, math, traceback, faulthandler
 faulthandler.enable()
 # Helps avoid odd GPU driver issues when painting
 os.environ.setdefault("QT_OPENGL", "software")
 
-from PyQt5.QtWidgets import (
+from PyQt6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton,
     QFormLayout, QGridLayout, QHBoxLayout, QCheckBox
 )
-from PyQt5.QtGui import QPainter, QColor, QPen
-from PyQt5.QtCore import Qt
+from PyQt6.QtGui import QPainter, QColor, QPen
+from PyQt6.QtCore import Qt
 
 from AxialMotorFixedParam import AxialMotorDesign
 
@@ -26,7 +26,8 @@ class VisualizationWidget(QWidget):
             painter = QPainter(self)
             if not painter.isActive():
                 return
-            painter.setRenderHint(QPainter.Antialiasing)
+            # Qt6: use RenderHint enum
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
             try:
                 raw = self.get_num_coils()
@@ -65,12 +66,29 @@ class MainWindow(QWidget):
 
     # ------------------------------ UI --------------------------------------
     def initUI(self):
-        self.setWindowTitle('Axial Flux Motor Calculator')
+        """ self.setWindowTitle('Axial Flux Motor Calculator')
         main_layout = QHBoxLayout(self)
         left_layout = QVBoxLayout()
+        right_layout = QVBoxLayout() """
+        from PyQt6.QtWidgets import QScrollArea
+
+        main_layout = QHBoxLayout(self)
+
+        # Scrollable left panel
+        left_container = QWidget()
+        left_layout = QVBoxLayout(left_container)
+
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(left_container)
+
         right_layout = QVBoxLayout()
 
+
         form_layout = QFormLayout()
+        main_layout.addWidget(scroll, 1)
+        main_layout.addLayout(right_layout, 1)
+
 
         # Inputs: QLineEdit for numeric; QCheckBox for booleans
         self.inputs = {
@@ -172,7 +190,8 @@ class MainWindow(QWidget):
         for key, label in self.result_labels.items():
             results_layout.addWidget(label, row, 0)
             value_label = QLabel("—")
-            value_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
+            # Qt6: TextInteractionFlag enum
+            value_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
             results_layout.addWidget(value_label, row, 1)
             self.result_values[key] = value_label
             row += 1
@@ -259,4 +278,5 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     win = MainWindow()
     win.show()
-    sys.exit(app.exec_())
+    # Qt6: exec_() → exec()
+    sys.exit(app.exec())
